@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Badass Mobile Welding</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+            color: white;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 3rem;
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .admin-container {
+            display: none;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: #ff6b35;
+        }
+
+        .logout-btn {
+            background: #ff6b35;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 1.5rem;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 107, 53, 0.2);
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #ff6b35;
+        }
+
+        .stat-label {
+            color: #b0b0b0;
+            margin-top: 0.5rem;
+        }
+
+        .forms-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 107, 53, 0.2);
+        }
+
+        .form-submission {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            border-left: 4px solid #ff6b35;
+        }
+
+        .submission-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .submission-date {
+            color: #ff6b35;
+            font-weight: 600;
+        }
+
+        .submission-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-new {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .status-contacted {
+            background: #28a745;
+            color: white;
+        }
+
+        .submission-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .detail-item {
+            margin-bottom: 0.5rem;
+        }
+
+        .detail-label {
+            color: #b0b0b0;
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            color: white;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            font-size: 1rem;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #ff6b35;
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.3);
+        }
+
+        .form-group input::placeholder {
+            color: #b0b0b0;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, #ff6b35, #ffa500);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.4);
+        }
+
+        .error-message {
+            color: #ff4444;
+            text-align: center;
+            margin-top: 1rem;
+        }
+
+        .contact-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+
+        .btn-small {
+            padding: 6px 12px;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .btn-call {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-email {
+            background: #007bff;
+            color: white;
+        }
+
+        .btn-mark-contacted {
+            background: #6c757d;
+            color: white;
+        }
+
+        .refresh-btn {
+            background: transparent;
+            border: 2px solid #ff6b35;
+            color: #ff6b35;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .refresh-btn:hover {
+            background: #ff6b35;
+            color: white;
+        }
+
+        .export-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 107, 53, 0.3);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        @media (max-width: 768px) {
+            .submission-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            .submission-details {
+                grid-template-columns: 1fr;
+            }
+
+            .contact-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginContainer" class="login-container">
+        <div class="login-box">
+            <h2 style="text-align: center; margin-bottom: 2rem; color: #ff6b35;">
+                ⚡ Admin Login
+            </h2>
+            <form id="loginForm">
+                <div class="form-group">
+                    <input type="text" id="username" placeholder="Username" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="password" placeholder="Password" required>
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+                <div id="loginError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminContainer" class="admin-container">
+        <div class="header">
+            <div class="logo">⚡ Badass Mobile Welding Admin</div>
+            <div>
+                <button id="refreshBtn" class="refresh-btn">Refresh Data</button>
+                <button id="exportBtn" class="export-btn">Export CSV</button>
+                <button id="logoutBtn" class="logout-btn">Logout</button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="totalSubmissions">0</div>
+                <div class="stat-label">Total Quotes</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="newSubmissions">0</div>
+                <div class="stat-label">New Today</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="pendingSubmissions">0</div>
+                <div class="stat-label">Pending</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="contactedSubmissions">0</div>
+                <div class="stat-label">Contacted</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <select id="statusFilter" class="filter-select">
+                <option value="all">All Status</option>
+                <option value="new">New</option>
+                <option value="contacted">Contacted</option>
+            </select>
+            <select id="dateFilter" class="filter-select">
+                <option value="all">All Dates</option>
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+            </select>
+        </div>
+
+        <div class="forms-container">
+            <h3 style="margin-bottom: 1.5rem; color: #ff6b35;">📋 Quote Requests</h3>
+            <div id="submissionsContainer">
+                <!-- Form submissions will be loaded here -->
+                <div class="form-submission">
+                    <div class="submission-header">
+                        <div class="submission-date">Loading submissions...</div>
+                    </div>
+                    <p>Connect to Netlify Forms API to view real form data.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Admin credentials (in production, use proper authentication)
+        const ADMIN_CREDENTIALS = {
+            username: 'admin',
+            password: 'badass2025!'
+        };
+
+        // Mock data for demonstration
+        const mockSubmissions = [
+            {
+                id: 1,
+                date: new Date().toISOString(),
+                name: 'John Smith',
+                phone: '(865) 555-0123',
+                zipCode: '37772',
+                project: 'Need structural welding for barn construction',
+                status: 'new'
+            },
+            {
+                id: 2,
+                date: new Date(Date.now() - 86400000).toISOString(),
+                name: 'Sarah Johnson',
+                phone: '(865) 555-0456',
+                zipCode: '37771',
+                project: 'Custom gate for driveway entrance',
+                status: 'contacted'
+            },
+            {
+                id: 3,
+                date: new Date(Date.now() - 172800000).toISOString(),
+                name: 'Mike Davis',
+                phone: '(865) 555-0789',
+                zipCode: '37774',
+                project: 'Heavy equipment repair - excavator bucket',
+                status: 'new'
+            }
+        ];
+
+        // Login functionality
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            
+            if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                document.getElementById('loginContainer').style.display = 'none';
+                document.getElementById('adminContainer').style.display = 'block';
+                loadDashboard();
+            } else {
+                document.getElementById('loginError').textContent = 'Invalid credentials';
+            }
+        });
+
+        // Logout functionality
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            document.getElementById('loginContainer').style.display = 'flex';
+            document.getElementById('adminContainer').style.display = 'none';
+            document.getElementById('loginForm').reset();
+            document.getElementById('loginError').textContent = '';
+        });
+
+        // Load dashboard data
+        function loadDashboard() {
+            loadStats();
+            loadSubmissions();
+        }
+
+        // Load statistics
+        function loadStats() {
+            const today = new Date().toDateString();
+            const newToday = mockSubmissions.filter(sub => 
+                new Date(sub.date).toDateString() === today
+            ).length;
+            
+            const pending = mockSubmissions.filter(sub => sub.status === 'new').length;
+            const contacted = mockSubmissions.filter(sub => sub.status === 'contacted').length;
+
+            document.getElementById('totalSubmissions').textContent = mockSubmissions.length;
+            document.getElementById('newSubmissions').textContent = newToday;
+            document.getElementById('pendingSubmissions').textContent = pending;
+            document.getElementById('contactedSubmissions').textContent = contacted;
+        }
+
+        // Load form submissions
+        function loadSubmissions() {
+            const container = document.getElementById('submissionsContainer');
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFilter = document.getElementById('dateFilter').value;
+
+            let filteredSubmissions = [...mockSubmissions];
+
+            // Apply filters
+            if (statusFilter !== 'all') {
+                filteredSubmissions = filteredSubmissions.filter(sub => sub.status === statusFilter);
+            }
+
+            if (dateFilter !== 'all') {
+                const now = new Date();
+                filteredSubmissions = filteredSubmissions.filter(sub => {
+                    const subDate = new Date(sub.date);
+                    switch (dateFilter) {
+                        case 'today':
+                            return subDate.toDateString() === now.toDateString();
+                        case 'week':
+                            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+                            return subDate >= weekAgo;
+                        case 'month':
+                            const monthAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+                            return subDate >= monthAgo;
+                        default:
+                            return true;
+                    }
+                });
+            }
+
+            // Sort by date (newest first)
+            filteredSubmissions.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+            container.innerHTML = '';
+
+            filteredSubmissions.forEach(submission => {
+                const submissionElement = createSubmissionElement(submission);
+                container.appendChild(submissionElement);
+            });
+
+            if (filteredSubmissions.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #b0b0b0;">No submissions found.</p>';
+            }
+        }
+
+        // Create submission element
+        function createSubmissionElement(submission) {
+            const div = document.createElement('div');
+            div.className = 'form-submission';
+            
+            const date = new Date(submission.date).toLocaleString();
+            const statusClass = submission.status === 'new' ? 'status-new' : 'status-contacted';
+            
+            div.innerHTML = `
+                <div class="submission-header">
+                    <div class="submission-date">${date}</div>
+                    <div class="submission-status ${statusClass}">${submission.status.toUpperCase()}</div>
+                </div>
+                <div class="submission-details">
+                    <div class="detail-item">
+                        <div class="detail-label">Name</div>
+                        <div class="detail-value">${submission.name}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Phone</div>
+                        <div class="detail-value">${submission.phone}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Zip Code</div>
+                        <div class="detail-value">${submission.zipCode}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Project</div>
+                        <div class="detail-value">${submission.project}</div>
+                    </div>
+                </div>
+                <div class="contact-actions">
+                    <button class="btn-small btn-call" onclick="callCustomer('${submission.phone}')">📞 Call</button>
+                    <button class="btn-small btn-email" onclick="emailCustomer('${submission.name}')">✉️ Email</button>
+                    ${submission.status === 'new' ? 
+                        `<button class="btn-small btn-mark-contacted" onclick="markContacted(${submission.id})">Mark as Contacted</button>` : 
+                        ''
+                    }
+                </div>
+            `;
+            
+            return div;
+        }
+
+        // Action functions
+        function callCustomer(phone) {
+            window.open(`tel:${phone}`);
+        }
+
+        function emailCustomer(name) {
+            const subject = encodeURIComponent(`Badass Mobile Welding - Quote for ${name}`);
+            const body = encodeURIComponent(`Hi ${name},\n\nThank you for requesting a quote from Badass Mobile Welding. I'd like to discuss your project and provide you with a detailed estimate.\n\nWhen would be a good time for a quick call?\n\nBest regards,\nBadass Mobile Welding Team`);
+            window.open(`mailto:?subject=${subject}&body=${body}`);
+        }
+
+        function markContacted(id) {
+            const submission = mockSubmissions.find(sub => sub.id === id);
+            if (submission) {
+                submission.status = 'contacted';
+                loadDashboard();
+            }
+        }
+
+        // Export to CSV
+        document.getElementById('exportBtn').addEventListener('click', function() {
+            const csv = convertToCSV(mockSubmissions);
+            downloadCSV(csv, 'welding-quotes.csv');
+        });
+
+        function convertToCSV(data) {
+            const headers = ['Date', 'Name', 'Phone', 'Zip Code', 'Project', 'Status'];
+            const rows = data.map(item => [
+                new Date(item.date).toLocaleString(),
+                item.name,
+                item.phone,
+                item.zipCode,
+                `"${item.project}"`,
+                item.status
+            ]);
+            
+            return [headers, ...rows].map(row => row.join(',')).join('\n');
+        }
+
+        function downloadCSV(csv, filename) {
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            window.URL.revokeObjectURL(url);
+        }
+
+        // Refresh data
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+            loadDashboard();
+        });
+
+        // Filter event listeners
+        document.getElementById('statusFilter').addEventListener('change', loadSubmissions);
+        document.getElementById('dateFilter').addEventListener('change', loadSubmissions);
+
+        // Note about real Netlify integration
+        console.log(`
+
+        `);
+    </script>
+</body>
+</html>
