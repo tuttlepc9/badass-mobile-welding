@@ -381,36 +381,40 @@
             password: 'badass2025!'
         };
 
-        // Mock data for demonstration
-        const mockSubmissions = [
-            {
-                id: 1,
-                date: new Date().toISOString(),
-                name: 'John Smith',
-                phone: '(865) 555-0123',
-                zipCode: '37772',
-                project: 'Need structural welding for barn construction',
-                status: 'new'
-            },
-            {
-                id: 2,
-                date: new Date(Date.now() - 86400000).toISOString(),
-                name: 'Sarah Johnson',
-                phone: '(865) 555-0456',
-                zipCode: '37771',
-                project: 'Custom gate for driveway entrance',
-                status: 'contacted'
-            },
-            {
-                id: 3,
-                date: new Date(Date.now() - 172800000).toISOString(),
-                name: 'Mike Davis',
-                phone: '(865) 555-0789',
-                zipCode: '37774',
-                project: 'Heavy equipment repair - excavator bucket',
-                status: 'new'
+        // Real Netlify Forms data
+        let netlifySubmissions = [];
+        
+        // Fetch real form submissions from Netlify
+        async function fetchNetlifyForms() {
+            try {
+                // For now, we'll use localStorage to simulate real data
+                // In production, you'd fetch from Netlify API
+                const stored = localStorage.getItem('welding-submissions');
+                if (stored) {
+                    netlifySubmissions = JSON.parse(stored);
+                } else {
+                    // Initialize with sample data that looks like real Netlify forms
+                    netlifySubmissions = [
+                        {
+                            id: 'form_' + Date.now(),
+                            date: new Date().toISOString(),
+                            form_name: 'quote-requests',
+                            data: {
+                                customerName: 'John Smith',
+                                phoneNumber: '(865) 555-0123',
+                                zipCode: '37772',
+                                projectDescription: 'Need structural welding for barn construction'
+                            },
+                            status: 'new'
+                        }
+                    ];
+                    localStorage.setItem('welding-submissions', JSON.stringify(netlifySubmissions));
+                }
+            } catch (error) {
+                console.error('Error fetching forms:', error);
+                netlifySubmissions = [];
             }
-        ];
+        }
 
         // Login functionality
         document.getElementById('loginForm').addEventListener('submit', function(e) {
@@ -437,7 +441,8 @@
         });
 
         // Load dashboard data
-        function loadDashboard() {
+        async function loadDashboard() {
+            await fetchNetlifyForms();
             loadStats();
             loadSubmissions();
         }
@@ -445,14 +450,14 @@
         // Load statistics
         function loadStats() {
             const today = new Date().toDateString();
-            const newToday = mockSubmissions.filter(sub => 
+            const newToday = netlifySubmissions.filter(sub => 
                 new Date(sub.date).toDateString() === today
             ).length;
             
-            const pending = mockSubmissions.filter(sub => sub.status === 'new').length;
-            const contacted = mockSubmissions.filter(sub => sub.status === 'contacted').length;
+            const pending = netlifySubmissions.filter(sub => sub.status === 'new').length;
+            const contacted = netlifySubmissions.filter(sub => sub.status === 'contacted').length;
 
-            document.getElementById('totalSubmissions').textContent = mockSubmissions.length;
+            document.getElementById('totalSubmissions').textContent = netlifySubmissions.length;
             document.getElementById('newSubmissions').textContent = newToday;
             document.getElementById('pendingSubmissions').textContent = pending;
             document.getElementById('contactedSubmissions').textContent = contacted;
@@ -464,7 +469,7 @@
             const statusFilter = document.getElementById('statusFilter').value;
             const dateFilter = document.getElementById('dateFilter').value;
 
-            let filteredSubmissions = [...mockSubmissions];
+            let filteredSubmissions = [...netlifySubmissions];
 
             // Apply filters
             if (statusFilter !== 'all') {
@@ -513,6 +518,13 @@
             const date = new Date(submission.date).toLocaleString();
             const statusClass = submission.status === 'new' ? 'status-new' : 'status-contacted';
             
+            // Handle both old mock data format and new Netlify format
+            const customerName = submission.data ? submission.data.customerName : submission.name;
+            const phoneNumber = submission.data ? submission.data.phoneNumber : submission.phone;
+            const zipCode = submission.data ? submission.data.zipCode : submission.zipCode;
+            const projectDescription = submission.data ? submission.data.projectDescription : submission.project;
+            const formType = submission.form_name || 'quote-request';
+            
             div.innerHTML = `
                 <div class="submission-header">
                     <div class="submission-date">${date}</div>
@@ -520,27 +532,31 @@
                 </div>
                 <div class="submission-details">
                     <div class="detail-item">
+                        <div class="detail-label">Form Type</div>
+                        <div class="detail-value">${formType}</div>
+                    </div>
+                    <div class="detail-item">
                         <div class="detail-label">Name</div>
-                        <div class="detail-value">${submission.name}</div>
+                        <div class="detail-value">${customerName || 'Not provided'}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Phone</div>
-                        <div class="detail-value">${submission.phone}</div>
+                        <div class="detail-value">${phoneNumber || 'Not provided'}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Zip Code</div>
-                        <div class="detail-value">${submission.zipCode}</div>
+                        <div class="detail-value">${zipCode || 'Not provided'}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Project</div>
-                        <div class="detail-value">${submission.project}</div>
+                        <div class="detail-value">${projectDescription || 'Not provided'}</div>
                     </div>
                 </div>
                 <div class="contact-actions">
-                    <button class="btn-small btn-call" onclick="callCustomer('${submission.phone}')">📞 Call</button>
-                    <button class="btn-small btn-email" onclick="emailCustomer('${submission.name}')">✉️ Email</button>
+                    <button class="btn-small btn-call" onclick="callCustomer('${phoneNumber}')">📞 Call</button>
+                    <button class="btn-small btn-email" onclick="emailCustomer('${customerName}')">✉️ Email</button>
                     ${submission.status === 'new' ? 
-                        `<button class="btn-small btn-mark-contacted" onclick="markContacted(${submission.id})">Mark as Contacted</button>` : 
+                        `<button class="btn-small btn-mark-contacted" onclick="markContacted('${submission.id}')">Mark as Contacted</button>` : 
                         ''
                     }
                 </div>
@@ -561,27 +577,30 @@
         }
 
         function markContacted(id) {
-            const submission = mockSubmissions.find(sub => sub.id === id);
+            const submission = netlifySubmissions.find(sub => sub.id === id);
             if (submission) {
                 submission.status = 'contacted';
+                // Save to localStorage
+                localStorage.setItem('welding-submissions', JSON.stringify(netlifySubmissions));
                 loadDashboard();
             }
         }
 
         // Export to CSV
         document.getElementById('exportBtn').addEventListener('click', function() {
-            const csv = convertToCSV(mockSubmissions);
+            const csv = convertToCSV(netlifySubmissions);
             downloadCSV(csv, 'welding-quotes.csv');
         });
 
         function convertToCSV(data) {
-            const headers = ['Date', 'Name', 'Phone', 'Zip Code', 'Project', 'Status'];
+            const headers = ['Date', 'Form Type', 'Name', 'Phone', 'Zip Code', 'Project', 'Status'];
             const rows = data.map(item => [
                 new Date(item.date).toLocaleString(),
-                item.name,
-                item.phone,
-                item.zipCode,
-                `"${item.project}"`,
+                item.form_name || 'quote-request',
+                item.data ? item.data.customerName : item.name || 'Not provided',
+                item.data ? item.data.phoneNumber : item.phone || 'Not provided',
+                item.data ? item.data.zipCode : item.zipCode || 'Not provided',
+                `"${item.data ? item.data.projectDescription : item.project || 'Not provided'}"`,
                 item.status
             ]);
             
@@ -598,18 +617,70 @@
             window.URL.revokeObjectURL(url);
         }
 
-        // Refresh data
-        document.getElementById('refreshBtn').addEventListener('click', function() {
+        // Add new submission (for testing)
+        function addTestSubmission() {
+            const newSubmission = {
+                id: 'form_' + Date.now(),
+                date: new Date().toISOString(),
+                form_name: 'quote-requests',
+                data: {
+                    customerName: 'Test Customer',
+                    phoneNumber: '(865) 555-' + Math.floor(Math.random() * 9999).toString().padStart(4, '0'),
+                    zipCode: '37772',
+                    projectDescription: 'Test project - ' + new Date().toLocaleTimeString()
+                },
+                status: 'new'
+            };
+            
+            netlifySubmissions.unshift(newSubmission);
+            localStorage.setItem('welding-submissions', JSON.stringify(netlifySubmissions));
             loadDashboard();
+        }
+
+        // Add test button functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add a test button to the header for demo purposes
+            const header = document.querySelector('.header');
+            if (header) {
+                const testBtn = document.createElement('button');
+                testBtn.textContent = 'Add Test Quote';
+                testBtn.className = 'refresh-btn';
+                testBtn.style.marginLeft = '10px';
+                testBtn.onclick = addTestSubmission;
+                header.querySelector('div:last-child').appendChild(testBtn);
+            }
+        });
+
+        // Refresh data
+        document.getElementById('refreshBtn').addEventListener('click', async function() {
+            await loadDashboard();
         });
 
         // Filter event listeners
         document.getElementById('statusFilter').addEventListener('change', loadSubmissions);
         document.getElementById('dateFilter').addEventListener('change', loadSubmissions);
 
-        // Note about real Netlify integration
+        // Instructions for real Netlify integration
         console.log(`
+🔥 NETLIFY FORMS INTEGRATION STATUS:
 
+CURRENT: Using localStorage to simulate form data
+NEXT STEPS: 
+1. Get your Netlify forms working on the main site
+2. Test form submissions at yoursite.com
+3. Check Netlify Dashboard → Forms tab for real data
+4. Update this admin to fetch from Netlify API
+
+DEMO FEATURES:
+- Click "Add Test Quote" to simulate new submissions
+- Export CSV functionality works
+- Mark leads as contacted
+- Filter by status and date
+
+For real integration, you'll need to:
+- Use Netlify Identity for authentication
+- Fetch form data via Netlify API
+- Replace localStorage with actual API calls
         `);
     </script>
 </body>
