@@ -361,7 +361,7 @@
         </div>
 
         <div class="forms-container">
-            <h3 style="margin-bottom: 1.5rem; color: #ff6b35;">📋 Quote Requests</h3>
+            <h3 style="margin-bottom: 1.5rem; color: #ff6b35;">📋 Lead Management Dashboard</h3>
             <div id="submissionsContainer">
                 <!-- Form submissions will be loaded here -->
                 <div class="form-submission">
@@ -405,7 +405,34 @@
                                 zipCode: '37772',
                                 projectDescription: 'Need structural welding for barn construction'
                             },
-                            status: 'new'
+                            status: 'new',
+                            source: 'website_form'
+                        },
+                        {
+                            id: 'form_' + (Date.now() - 86400000),
+                            date: new Date(Date.now() - 86400000).toISOString(),
+                            form_name: 'contact-messages',
+                            data: {
+                                contactName: 'Sarah Johnson',
+                                email: 'sarah.j@email.com',
+                                contactPhone: '(865) 555-0456',
+                                message: 'Custom gate for driveway entrance'
+                            },
+                            status: 'contacted',
+                            source: 'website_form'
+                        },
+                        {
+                            id: 'call_' + (Date.now() - 172800000),
+                            date: new Date(Date.now() - 172800000).toISOString(),
+                            form_name: 'phone-calls',
+                            data: {
+                                customerName: 'Mike Davis',
+                                phoneNumber: '(865) 555-0789',
+                                projectDescription: 'Heavy equipment repair - excavator bucket',
+                                transcript: 'Customer called about urgent equipment repair needed this week'
+                            },
+                            status: 'new',
+                            source: 'phone_call'
                         }
                     ];
                     localStorage.setItem('welding-submissions', JSON.stringify(netlifySubmissions));
@@ -518,43 +545,74 @@
             const date = new Date(submission.date).toLocaleString();
             const statusClass = submission.status === 'new' ? 'status-new' : 'status-contacted';
             
-            // Handle both old mock data format and new Netlify format
-            const customerName = submission.data ? submission.data.customerName : submission.name;
-            const phoneNumber = submission.data ? submission.data.phoneNumber : submission.phone;
-            const zipCode = submission.data ? submission.data.zipCode : submission.zipCode;
-            const projectDescription = submission.data ? submission.data.projectDescription : submission.project;
-            const formType = submission.form_name || 'quote-request';
+            // Handle different form types
+            let customerName = 'Not provided';
+            let phoneNumber = 'Not provided';
+            let email = '';
+            let zipCode = 'Not provided';
+            let projectDescription = 'Not provided';
+            let source = submission.source || 'website_form';
+            
+            if (submission.data) {
+                // Quote form data
+                if (submission.form_name === 'quote-requests') {
+                    customerName = submission.data.customerName || 'Not provided';
+                    phoneNumber = submission.data.phoneNumber || 'Not provided';
+                    zipCode = submission.data.zipCode || 'Not provided';
+                    projectDescription = submission.data.projectDescription || 'Not provided';
+                }
+                // Contact form data
+                else if (submission.form_name === 'contact-messages') {
+                    customerName = submission.data.contactName || 'Not provided';
+                    phoneNumber = submission.data.contactPhone || 'Not provided';
+                    email = submission.data.email || '';
+                    projectDescription = submission.data.message || 'Not provided';
+                }
+                // Phone call data
+                else if (submission.form_name === 'phone-calls') {
+                    customerName = submission.data.customerName || 'Not provided';
+                    phoneNumber = submission.data.phoneNumber || 'Not provided';
+                    projectDescription = submission.data.transcript || submission.data.projectDescription || 'Not provided';
+                }
+            }
+            
+            const sourceIcon = source === 'phone_call' ? '📞' : '💻';
+            const sourceLabel = source === 'phone_call' ? 'Phone Call' : 'Website Form';
             
             div.innerHTML = `
                 <div class="submission-header">
-                    <div class="submission-date">${date}</div>
+                    <div class="submission-date">${sourceIcon} ${date}</div>
                     <div class="submission-status ${statusClass}">${submission.status.toUpperCase()}</div>
                 </div>
                 <div class="submission-details">
                     <div class="detail-item">
-                        <div class="detail-label">Form Type</div>
-                        <div class="detail-value">${formType}</div>
+                        <div class="detail-label">Source</div>
+                        <div class="detail-value">${sourceLabel} (${submission.form_name})</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Name</div>
-                        <div class="detail-value">${customerName || 'Not provided'}</div>
+                        <div class="detail-value">${customerName}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Phone</div>
-                        <div class="detail-value">${phoneNumber || 'Not provided'}</div>
+                        <div class="detail-value">${phoneNumber}</div>
                     </div>
-                    <div class="detail-item">
+                    ${email ? `<div class="detail-item">
+                        <div class="detail-label">Email</div>
+                        <div class="detail-value">${email}</div>
+                    </div>` : ''}
+                    ${zipCode !== 'Not provided' ? `<div class="detail-item">
                         <div class="detail-label">Zip Code</div>
-                        <div class="detail-value">${zipCode || 'Not provided'}</div>
-                    </div>
+                        <div class="detail-value">${zipCode}</div>
+                    </div>` : ''}
                     <div class="detail-item">
-                        <div class="detail-label">Project</div>
-                        <div class="detail-value">${projectDescription || 'Not provided'}</div>
+                        <div class="detail-label">Project Details</div>
+                        <div class="detail-value">${projectDescription}</div>
                     </div>
                 </div>
                 <div class="contact-actions">
                     <button class="btn-small btn-call" onclick="callCustomer('${phoneNumber}')">📞 Call</button>
-                    <button class="btn-small btn-email" onclick="emailCustomer('${customerName}')">✉️ Email</button>
+                    ${email ? `<button class="btn-small btn-email" onclick="emailCustomer('${customerName}', '${email}')">✉️ Email</button>` : ''}
                     ${submission.status === 'new' ? 
                         `<button class="btn-small btn-mark-contacted" onclick="markContacted('${submission.id}')">Mark as Contacted</button>` : 
                         ''
@@ -567,13 +625,21 @@
 
         // Action functions
         function callCustomer(phone) {
-            window.open(`tel:${phone}`);
+            if (phone && phone !== 'Not provided') {
+                window.open(`tel:${phone}`);
+            } else {
+                alert('No phone number available for this customer.');
+            }
         }
 
-        function emailCustomer(name) {
-            const subject = encodeURIComponent(`Badass Mobile Welding - Quote for ${name}`);
-            const body = encodeURIComponent(`Hi ${name},\n\nThank you for requesting a quote from Badass Mobile Welding. I'd like to discuss your project and provide you with a detailed estimate.\n\nWhen would be a good time for a quick call?\n\nBest regards,\nBadass Mobile Welding Team`);
-            window.open(`mailto:?subject=${subject}&body=${body}`);
+        function emailCustomer(name, email) {
+            if (email) {
+                const subject = encodeURIComponent(`Badass Mobile Welding - Quote for ${name}`);
+                const body = encodeURIComponent(`Hi ${name},\n\nThank you for contacting Badass Mobile Welding. I'd like to discuss your welding project and provide you with a detailed estimate.\n\nWhen would be a good time for a quick call?\n\nBest regards,\nBadass Mobile Welding Team\n\nCall us: (865) 328-7219\nWebsite: https://badassmobilewelding.com`);
+                window.open(`mailto:${email}?subject=${subject}&body=${body}`);
+            } else {
+                alert('No email available. Consider calling the customer instead.');
+            }
         }
 
         function markContacted(id) {
@@ -593,16 +659,44 @@
         });
 
         function convertToCSV(data) {
-            const headers = ['Date', 'Form Type', 'Name', 'Phone', 'Zip Code', 'Project', 'Status'];
-            const rows = data.map(item => [
-                new Date(item.date).toLocaleString(),
-                item.form_name || 'quote-request',
-                item.data ? item.data.customerName : item.name || 'Not provided',
-                item.data ? item.data.phoneNumber : item.phone || 'Not provided',
-                item.data ? item.data.zipCode : item.zipCode || 'Not provided',
-                `"${item.data ? item.data.projectDescription : item.project || 'Not provided'}"`,
-                item.status
-            ]);
+            const headers = ['Date', 'Source', 'Form Type', 'Name', 'Phone', 'Email', 'Zip Code', 'Project Details', 'Status'];
+            const rows = data.map(item => {
+                let customerName = 'Not provided';
+                let phoneNumber = 'Not provided';
+                let email = '';
+                let zipCode = '';
+                let projectDescription = 'Not provided';
+                
+                if (item.data) {
+                    if (item.form_name === 'quote-requests') {
+                        customerName = item.data.customerName || 'Not provided';
+                        phoneNumber = item.data.phoneNumber || 'Not provided';
+                        zipCode = item.data.zipCode || '';
+                        projectDescription = item.data.projectDescription || 'Not provided';
+                    } else if (item.form_name === 'contact-messages') {
+                        customerName = item.data.contactName || 'Not provided';
+                        phoneNumber = item.data.contactPhone || 'Not provided';
+                        email = item.data.email || '';
+                        projectDescription = item.data.message || 'Not provided';
+                    } else if (item.form_name === 'phone-calls') {
+                        customerName = item.data.customerName || 'Not provided';
+                        phoneNumber = item.data.phoneNumber || 'Not provided';
+                        projectDescription = item.data.transcript || item.data.projectDescription || 'Not provided';
+                    }
+                }
+                
+                return [
+                    new Date(item.date).toLocaleString(),
+                    item.source || 'website_form',
+                    item.form_name || 'unknown',
+                    customerName,
+                    phoneNumber,
+                    email,
+                    zipCode,
+                    `"${projectDescription}"`,
+                    item.status
+                ];
+            });
             
             return [headers, ...rows].map(row => row.join(',')).join('\n');
         }
