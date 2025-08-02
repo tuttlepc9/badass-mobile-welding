@@ -681,11 +681,11 @@
     </footer>
 
     <script>
-        // Quote form handling - simplified for Netlify
+        // Quote form handling - now that Netlify forms are enabled
         document.getElementById('quoteForm').addEventListener('submit', function(e) {
             const zipCode = document.getElementById('zipCode').value;
             
-            // Only validate zip code, don't prevent submission
+            // Validate zip code for service area
             const validZipCodes = ['37772', '37771', '37774', '37801', '37803', '37804'];
             const isValidZip = validZipCodes.some(zip => zipCode.includes(zip.substring(0, 4)));
             
@@ -695,7 +695,7 @@
                 return false;
             }
             
-            // If valid zip, let form submit naturally
+            // If valid zip, let form submit naturally to Netlify
             return true;
         });
 
