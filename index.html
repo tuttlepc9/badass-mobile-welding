@@ -495,18 +495,19 @@
 
                 <div class="quote-form">
                     <h3>Get a Free Quote Now</h3>
-                    <form id="quoteForm">
+                    <form name="quote-requests" method="POST" data-netlify="true" id="quoteForm">
+                        <input type="hidden" name="form-name" value="quote-requests">
                         <div class="form-group">
-                            <input type="text" placeholder="Enter Your Zip Code (e.g., 37772)" id="zipCode" required>
+                            <input type="text" name="zipCode" placeholder="Enter Your Zip Code (e.g., 37772)" id="zipCode" required>
                         </div>
                         <div class="form-group">
-                            <input type="text" placeholder="Your Name" id="customerName" required>
+                            <input type="text" name="customerName" placeholder="Your Name" id="customerName" required>
                         </div>
                         <div class="form-group">
-                            <input type="tel" placeholder="Phone Number" id="phoneNumber" required>
+                            <input type="tel" name="phoneNumber" placeholder="Phone Number" id="phoneNumber" required>
                         </div>
                         <div class="form-group">
-                            <input type="text" placeholder="Describe Your Project" id="projectDescription" required>
+                            <input type="text" name="projectDescription" placeholder="Describe Your Project" id="projectDescription" required>
                         </div>
                         <button type="submit" class="btn-primary">Check Availability & Get Quote</button>
                     </form>
@@ -644,18 +645,19 @@
 
                 <div class="contact-form">
                     <h3>Send Us a Message</h3>
-                    <form id="contactForm">
+                    <form name="contact-messages" method="POST" data-netlify="true" id="contactForm">
+                        <input type="hidden" name="form-name" value="contact-messages">
                         <div class="form-group">
-                            <input type="text" placeholder="Your Name" required>
+                            <input type="text" name="contactName" placeholder="Your Name" required>
                         </div>
                         <div class="form-group">
-                            <input type="email" placeholder="Email Address" required>
+                            <input type="email" name="email" placeholder="Email Address" required>
                         </div>
                         <div class="form-group">
-                            <input type="tel" placeholder="Phone Number" required>
+                            <input type="tel" name="contactPhone" placeholder="Phone Number" required>
                         </div>
                         <div class="form-group">
-                            <input type="text" placeholder="Project Details" required style="height: 100px;">
+                            <input type="text" name="message" placeholder="Project Details" required style="height: 100px;">
                         </div>
                         <button type="submit" class="btn-primary">Send Message</button>
                     </form>
