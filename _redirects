@@ -1,0 +1,63 @@
+# Netlify _redirects file
+# These rules handle URL redirects for better SEO and user experience
+
+# Main page redirects
+/quote              /#home              301
+/get-quote          /#home              301
+/request-quote      /#home              301
+
+# Service page redirects
+/services           /#services          301
+/welding            /#services          301
+/welding-services   /#services          301
+/structural         /#services          301
+/repairs            /#services          301
+/fabrication        /#services          301
+/custom             /#services          301
+
+# Gallery redirects
+/gallery            /#gallery           301
+/portfolio          /#gallery           301
+/work               /#gallery           301
+/projects           /#gallery           301
+
+# About/Testimonials redirects
+/about              /#testimonials      301
+/reviews            /#testimonials      301
+/testimonials       /#testimonials      301
+/clients            /#testimonials      301
+
+# Contact redirects
+/contact            /#contact           301
+/reach-out          /#contact           301
+/get-in-touch       /#contact           301
+/phone              /#contact           301
+/call               /#contact           301
+
+# Location-based redirects
+/lenoir-city        /#home              301
+/tennessee          /#home              301
+/east-tennessee     /#home              301
+/loudon-county      /#home              301
+
+# Service-specific redirects
+/mobile-welding     /#home              301
+/on-site-welding    /#home              301
+/emergency-repair   /#services          301
+/steel-fabrication  /#services          301
+
+# Common typos and variations
+/sevices            /#services          301
+/contac             /#contact           301
+/qoute              /#home              301
+
+# Catch-all for old pages that might have existed
+/home               /#home              301
+/index              /#home              301
+/main               /#home              301
+
+# Handle www redirects (if using custom domain)
+https://www.badasswelds.com/*  https://badasswelds.com/:splat  301!
+
+# 404 fallback - redirect unknown pages to home
+/*                  /                   404
