@@ -630,7 +630,7 @@
                     </div>
                     <div class="contact-item">
                         <span>📞</span>
-                        <span>(865) XXX-XXXX</span>
+                        <span>(865) 328-7219</span>
                     </div>
                     <div class="contact-item">
                         <span>✉️</span>
@@ -638,7 +638,7 @@
                     </div>
                     
                     <div style="margin-top: 2rem;">
-                        <a href="tel:865XXXXXXX" class="btn-secondary">Call Now</a>
+                        <a href="tel:8653287219" class="btn-secondary">Call Now</a>
                         <a href="#home" class="btn-secondary">Request Quote</a>
                     </div>
                 </div>
@@ -683,32 +683,30 @@
     <script>
         // Quote form handling
         document.getElementById('quoteForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+            // Let Netlify handle the form submission naturally
+            // Don't prevent default for Netlify forms
             
             const zipCode = document.getElementById('zipCode').value;
             const customerName = document.getElementById('customerName').value;
-            const phoneNumber = document.getElementById('phoneNumber').value;
-            const projectDescription = document.getElementById('projectDescription').value;
             
             // Simple validation for Lenoir City area codes
             const validZipCodes = ['37772', '37771', '37774', '37801', '37803', '37804'];
             const isValidZip = validZipCodes.some(zip => zipCode.includes(zip.substring(0, 4)));
             
-            if (isValidZip) {
-                alert(`Thanks ${customerName}! We serve your area (${zipCode}). We'll contact you at ${phoneNumber} within 24 hours with a free quote for: ${projectDescription}`);
-            } else {
-                alert(`Thanks for your interest! We primarily serve the Lenoir City, TN area. For areas outside our service zone, please call (865) XXX-XXXX to discuss options.`);
+            if (!isValidZip) {
+                e.preventDefault();
+                alert(`Thanks for your interest! We primarily serve the Lenoir City, TN area. For areas outside our service zone, please call (865) 328-7219 to discuss options.`);
+                return;
             }
             
-            // Reset form
-            this.reset();
+            // If valid zip, allow form to submit to Netlify
+            alert(`Thanks ${customerName}! We serve your area (${zipCode}). Your quote request has been submitted and we'll contact you within 24 hours.`);
         });
 
         // Contact form handling
         document.getElementById('contactForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+            // Let Netlify handle the submission
             alert('Message sent! We\'ll get back to you within 24 hours.');
-            this.reset();
         });
 
         // Smooth scrolling for navigation links
