@@ -1,0 +1,212 @@
+# netlify.toml
+[build]
+  publish = "."
+  command = "echo 'No build step required for static site'"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000"
+
+# Redirect rules
+[[redirects]]
+  from = "/quote"
+  to = "/#home"
+  status = 301
+
+[[redirects]]
+  from = "/services"
+  to = "/#services"
+  status = 301
+
+[[redirects]]
+  from = "/contact"
+  to = "/#contact"
+  status = 301
+
+---
+
+# README.md
+# Badass Mobile Welding Website
+
+Professional mobile welding services website for Lenoir City, TN and surrounding areas.
+
+## 🔥 Features
+
+- **Responsive Design**: Optimized for desktop, tablet, and mobile
+- **Modern UI**: Dark theme with orange accent colors and smooth animations
+- **Quote Form**: Interactive form with zip code validation for service area
+- **Service Showcase**: Three main service categories with detailed descriptions
+- **Client Testimonials**: Social proof from satisfied customers
+- **Portfolio Gallery**: Visual showcase of welding work
+- **Contact Integration**: Multiple contact methods and inquiry forms
+- **SEO Optimized**: Meta tags and semantic HTML structure
+
+## 🚀 Deployment
+
+This site is configured for easy deployment on Netlify:
+
+1. Push to GitHub repository
+2. Connect repository to Netlify
+3. Site will auto-deploy with each push to main branch
+
+## 📁 File Structure
+
+```
+/
+├── index.html          # Main website file
+├── netlify.toml        # Netlify configuration
+├── README.md           # Project documentation
+├── _redirects          # Additional redirect rules
+└── robots.txt          # SEO crawler instructions
+```
+
+## 🛠️ Technologies Used
+
+- **HTML5**: Semantic markup
+- **CSS3**: Modern styling with Grid, Flexbox, and animations
+- **JavaScript**: Interactive functionality and form handling
+- **Google Fonts**: Inter font family for modern typography
+
+## 🎨 Design Features
+
+- **Dark Theme**: Professional black/gray color scheme
+- **Orange Accents**: #ff6b35 brand color for highlights
+- **Animated Elements**: Smooth transitions and hover effects
+- **Spark Effects**: Subtle welding-themed animations
+- **Glass Morphism**: Modern translucent design elements
+
+## 📱 Mobile Responsive
+
+- Optimized layouts for all screen sizes
+- Touch-friendly interactive elements
+- Readable typography on mobile devices
+
+## 🔧 Customization
+
+To customize for your business:
+
+1. Update contact information in the HTML
+2. Replace placeholder phone numbers with real numbers
+3. Add actual photos to the gallery section
+4. Modify service descriptions as needed
+5. Update zip codes in JavaScript for your service area
+
+## 📊 Performance
+
+- Lightweight design with minimal external dependencies
+- Optimized images and assets
+- Fast loading times
+- SEO-friendly structure
+
+## 🌐 Live Demo
+
+Once deployed, the site will be available at your Netlify URL.
+
+---
+
+# _redirects
+# Netlify redirect rules (backup to netlify.toml)
+/quote              /#home              301
+/services           /#services          301
+/gallery            /#gallery           301
+/about              /#testimonials      301
+/contact            /#contact           301
+/get-quote          /#home              301
+/welding-services   /#services          301
+
+---
+
+# robots.txt
+User-agent: *
+Allow: /
+
+# Sitemap location
+Sitemap: https://your-domain.netlify.app/sitemap.xml
+
+# Block common bot paths
+Disallow: /admin/
+Disallow: /.netlify/
+Disallow: /functions/
+
+---
+
+# .gitignore
+# Dependencies
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Production builds
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Netlify
+.netlify/
+
+---
+
+# package.json (optional - for future enhancements)
+{
+  "name": "badass-mobile-welding",
+  "version": "1.0.0",
+  "description": "Professional mobile welding services website",
+  "main": "index.html",
+  "scripts": {
+    "start": "python -m http.server 8000",
+    "deploy": "netlify deploy --prod"
+  },
+  "keywords": [
+    "welding",
+    "mobile-welding",
+    "lenoir-city",
+    "tennessee",
+    "structural-welding",
+    "custom-fabrication"
+  ],
+  "author": "Badass Mobile Welding",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tuttlepc9/badass-mobile-welding.git"
+  }
+}
