@@ -683,9 +683,7 @@
     <script>
         // Quote form handling
         document.getElementById('quoteForm').addEventListener('submit', function(e) {
-            // Let Netlify handle the form submission naturally
-            // Don't prevent default for Netlify forms
-            
+            // Remove the preventDefault to let Netlify handle the form
             const zipCode = document.getElementById('zipCode').value;
             const customerName = document.getElementById('customerName').value;
             
@@ -699,14 +697,14 @@
                 return;
             }
             
-            // If valid zip, allow form to submit to Netlify
-            alert(`Thanks ${customerName}! We serve your area (${zipCode}). Your quote request has been submitted and we'll contact you within 24 hours.`);
+            // If valid zip, let the form submit naturally to Netlify
+            // No preventDefault here - let it go to thank-you.html
         });
 
         // Contact form handling
         document.getElementById('contactForm').addEventListener('submit', function(e) {
-            // Let Netlify handle the submission
-            alert('Message sent! We\'ll get back to you within 24 hours.');
+            // Let Netlify handle the submission naturally
+            // No preventDefault - let it go to thank-you.html
         });
 
         // Smooth scrolling for navigation links
